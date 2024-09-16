@@ -39,32 +39,28 @@ class _BeachMapState extends State<BeachMap> {
 
   // List of beaches
   final List<Beach> beaches = [
-    // Andhra Pradesh beaches
     Beach(name: 'Rushikonda Beach', position: LatLng(17.7833, 83.3883), snippet: 'Andhra Pradesh'),
     Beach(name: 'Bheemunipatnam Beach', position: LatLng(17.8924, 83.4520), snippet: 'Andhra Pradesh'),
     Beach(name: 'Manginapudi Beach', position: LatLng(16.1782, 81.1391), snippet: 'Andhra Pradesh'),
     Beach(name: 'Mypad Beach', position: LatLng(14.3623, 80.1417), snippet: 'Andhra Pradesh'),
     Beach(name: 'Vodarevu Beach', position: LatLng(15.8357, 80.3512), snippet: 'Andhra Pradesh'),
-    // Goa beaches
     Beach(name: 'Colva Beach', position: LatLng(15.2793, 73.9220), snippet: 'Goa'),
     Beach(name: 'Dona Paula Beach', position: LatLng(15.4667, 73.8333), snippet: 'Goa'),
     Beach(name: 'Anjuna Beach', position: LatLng(15.5819, 73.7432), snippet: 'Goa'),
     Beach(name: 'Arambol Beach', position: LatLng(15.6869, 73.7046), snippet: 'Goa'),
-    // Gujarat beaches
     Beach(name: 'Porbandar Beach', position: LatLng(21.6421, 69.6293), snippet: 'Gujarat'),
     Beach(name: 'Mandvi Beach', position: LatLng(22.8327, 69.3460), snippet: 'Gujarat'),
     Beach(name: 'Somnath Beach', position: LatLng(20.8880, 70.4017), snippet: 'Gujarat'),
     Beach(name: 'Chorwad Beach', position: LatLng(21.0169, 70.2166), snippet: 'Gujarat'),
-    // More beaches can be added here
   ];
-
 
   @override
   void initState() {
     super.initState();
-    _addMarkers();
+    _addMarkers(); // Add the markers when the map initializes
   }
 
+  // Method to add beach markers
   void _addMarkers() {
     setState(() {
       _markers.clear();
@@ -111,6 +107,26 @@ class _BeachMapState extends State<BeachMap> {
               },
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _showCustomMenu() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Allow scrollable content
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.6, // Adjust height as needed
+          child: CustomMenu(
+            items: [
+              MenuItem(title: 'Feedback', icon: Icons.feedback, color: Colors.deepPurple),
+              MenuItem(title: 'Recommendations', icon: Icons.recommend, color: Colors.deepPurple),
+              MenuItem(title: 'Favorites', icon: Icons.favorite, color: Colors.deepPurple),
+              MenuItem(title: 'Alerts', icon: Icons.notifications, color: Colors.deepPurple),
+            ],
+          ),
         );
       },
     );
@@ -184,8 +200,82 @@ class _BeachMapState extends State<BeachMap> {
               ],
             ),
           ),
+          Positioned(
+            top: 16,
+            right: 16,
+            child: IconButton(
+              icon: Icon(Icons.more_vert, color: Colors.deepPurple),
+              onPressed: _showCustomMenu,
+            ),
+          ),
         ],
       ),
     );
   }
+}
+
+class CustomMenu extends StatelessWidget {
+  final List<MenuItem> items;
+
+  CustomMenu({required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(16.0),
+        child: GridView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(), // Prevent GridView from scrolling
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16.0,
+            mainAxisSpacing: 16.0,
+            childAspectRatio: 1.0,
+          ),
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return Container(
+              decoration: BoxDecoration(
+                color: item.color,
+                borderRadius: BorderRadius.circular(20.0), // Adjust curvature
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20.0), // Match the radius
+                  onTap: () {
+                    // Handle menu item tap
+                  },
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(item.icon, color: Colors.white, size: 32.0),
+                        SizedBox(height: 8.0),
+                        Text(
+                          item.title,
+                          style: TextStyle(color: Colors.white, fontSize: 16.0),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class MenuItem {
+  final String title;
+  final IconData icon;
+  final Color color;
+
+  MenuItem({required this.title, required this.icon, required this.color});
 }
